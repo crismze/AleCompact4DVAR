@@ -1,0 +1,24 @@
+GFORTRAN module version '0' created from module_param.f90 on Mon Mar 15 19:22:20 2010
+MD5:7f87fd1cd347ccf8a5cb5aaa5ff01e0a -- If you edit this, you'll get what you deserve.
+
+(() () () () () () () () () () () () () () () () () () () () () () () ()
+() () ())
+
+()
+
+()
+
+()
+
+()
+
+(2 'bruit' 'param2_m' 'bruit' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN) (REAL 8 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+3 'param2_m' 'param2_m' 'param2_m' 1 ((MODULE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0 ()
+() () 0 0)
+4 'vdebit' 'param2_m' 'vdebit' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN) (REAL 8 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
+)
+
+('bruit' 0 2 'param2_m' 0 3 'vdebit' 0 4)

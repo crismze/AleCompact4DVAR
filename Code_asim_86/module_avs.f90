@@ -1,0 +1,253 @@
+!
+!*******************************************************************
+!
+subroutine create_script 
+!-----------------------------------------------
+!   M o d u l e s 
+!-----------------------------------------------
+  USE module_avs_m 
+!...Translated by PSUITE Trans90                  4.3ZH 16:38:40   1/27/ 4  
+!...Switches: -yv INDDO=0 -nbejkno
+  implicit none
+!-----------------------------------------------
+!   L o c a l   V a r i a b l e s
+!-----------------------------------------------
+  integer :: long_script, long_path_network, long_nom_film, long_path_files&
+         , long_nom_file, longueur 
+  character :: nomficorig*80, nomficolor*80 
+!-----------------------------------------------
+!
+!*******************************************************************
+!
+   long_script=index(nom_script,' ')-1 
+   long_path_network=index(path_network,' ')-1 
+   long_nom_film=index(nom_film,' ')-1 
+   long_path_files=index(path_files,' ')-1 
+   long_nom_file=index(nom_file,' ')-1 
+!
+   open(56,file=nom_script(1:long_script),status='unknown',form='formatted') 
+      write (56,'(A)') 'net_clear' 
+      write (56,'(A)') 'net_flow off' 
+      write (56,'(A)') 'net_read '//path_network(1:long_path_network)//&
+         nom_network 
+      write (56,'(A)') '#' 
+      write (56,'(A)') '# Affectation des parametres du champ 3D' 
+      write (56,'(A)') '#' 
+!      write(56,*)'parm_set isosurface.user.7:level ',val_iso
+!      write(56,*)'parm_set downsize.user.0:downsize ',ndsize
+!      write(56,'(A)')'parm_set "extract scalar.user.1":Channel'/
+!     1                  /' "channel 0"'
+      long_nom_film=index(nom_film,' ')-1 
+      long_path_files=index(path_files,' ')-1 
+      nomficorig=nom_file(1:long_nom_file)//'.fld' 
+      nomficolor=nom_file(1:long_nom_file)//'_2.fld' 
+      longueur=index(nomficorig,' ')-1 
+      write (56,'(A)') '#' 
+      write (56,'(A)') '# Lecture '//nomficorig(1:longueur) 
+      write (56,'(A)') '#' 
+      write (56,'(A)') 'parm_set "read field.user.0":"Read Field Browser" '//&
+         path_files(1:long_path_files)//nomficorig(1:longueur) 
+      write (56,'(A)') 'net_flow on' 
+      write (56,'(A)') 'net_flow off' 
+!
+   close(56) 
+!
+   return  
+end subroutine create_script
+!
+!*******************************************************************
+!
+subroutine execute_script(inum_fich) 
+!-----------------------------------------------
+!   M o d u l e s 
+!-----------------------------------------------
+  USE module_avs_m 
+!...Translated by PSUITE Trans90                  4.3ZH 16:38:40   1/27/ 4  
+!...Switches: -yv INDDO=0 -nbejkno
+  implicit none
+!-----------------------------------------------
+!   D u m m y   A r g u m e n t s
+!-----------------------------------------------
+  integer  :: inum_fich 
+!-----------------------------------------------
+!   L o c a l   V a r i a b l e s
+!-----------------------------------------------
+  integer :: long_script, long_path_files, long_nom_film 
+  character :: num_fich*4 
+!-----------------------------------------------
+!
+!*******************************************************************
+!
+   long_script=index(nom_script,' ')-1 
+   long_path_files=index(path_files,' ')-1 
+   long_nom_film=index(nom_film,' ')-1 
+!
+   call numcar2 (inum_fich,num_fich) 
+!
+!!   call system ('/usr/avs/bin/avs -cli "script -play '//path_files(1:&
+!!        long_path_files)//nom_script(1:long_script)//' -q"') 
+!!   call system ('mv ~/toto.jpg '//nom_film(1:long_nom_film)//num_fich//&
+ !!       '.jpg') 
+!
+   return  
+end subroutine execute_script
+!
+!*******************************************************************
+!
+subroutine sauve_avs(ux,nom_fichier,nx,ny,nz) 
+!-----------------------------------------------
+!   M o d u l e s 
+!-----------------------------------------------
+  USE module_avs_m 
+!...Translated by PSUITE Trans90                  4.3ZH 16:38:40   1/27/ 4  
+!...Switches: -yv INDDO=0 -nbejkno
+  implicit none
+!-----------------------------------------------
+!   D u m m y   A r g u m e n t s
+!-----------------------------------------------
+  integer , intent(in) :: nx 
+  integer , intent(in) :: ny 
+  integer , intent(in) :: nz 
+  character , intent(in) :: nom_fichier*80 
+  real , intent(in) :: ux(nx,ny,nz) 
+!-----------------------------------------------
+!   L o c a l   V a r i a b l e s
+!-----------------------------------------------
+  integer :: long_nom_fichier, i, j, k 
+!-----------------------------------------------
+!
+!*******************************************************************
+!
+   long_nom_fichier=index(nom_fichier,' ')-1 
+!
+   open(55,file=nom_fichier(1:long_nom_fichier)//'.avs',status='unknown',&
+        form='unformatted') 
+      write (55) (((ux(i,j,k),i=1,nx),j=1,ny),k=1,nz) 
+   close(55)
+!
+   open(55,file=nom_fichier(1:long_nom_fichier)//'.fld',status='unknown',&
+        form='formatted') 
+      write (55,'(A)') '# AVS field' 
+      write (55,'(A)') '# Generated by program lecture' 
+      write (55,'(A)') '# Contains data from file: '//nom_fichier(1:&
+         long_nom_fichier) 
+      write (55,'(A)') 'ndim    = 3              # 3D dataset' 
+      write (55,'(A)') 'nspace  = 3              # 3D computational space' 
+      write (55,*) 'veclen  = 1              # number of scalar fields' 
+      write (55,*) 'dim1 =',nx,'       # first dimension' 
+      write (55,*) 'dim2 =',ny,'       # second dimension' 
+      write (55,*) 'dim3 =',nz,'       # third dimension' 
+      write (55,*) 'data    =   float        # single precision' 
+      write (55,*) 'field   =   rectilinear      # type of field' 
+      write (55,*) 'variable 1 file =',&
+        nom_fichier(1:long_nom_fichier)//'.avs',&
+        '  filetype = unformatted skip = 0' 
+      write (55,*) 'coord 1 file =  avs.x',' filetype = unformatted  skip = 0' 
+      write (55,*) 'coord 2 file =  avs.y',' filetype = unformatted  skip = 0' 
+      write (55,*) 'coord 3 file =  avs.z',' filetype = unformatted  skip = 0' 
+!
+   close(55) 
+!
+   return  
+end subroutine sauve_avs
+!
+!******************************************************************
+!
+subroutine numcar2(num,car) 
+!...Translated by PSUITE Trans90                  4.3ZH 16:38:40   1/27/ 4  
+!...Switches: -yv INDDO=0 -nbejkno
+  implicit none
+!-----------------------------------------------
+!   D u m m y   A r g u m e n t s
+!-----------------------------------------------
+  integer , intent(in) :: num 
+  character , intent(out) :: car*4 
+!-----------------------------------------------
+!
+!******************************************************************
+!
+  if (num >= 1000) then 
+     write (car,4) num 
+4    format(i4) 
+  else 
+     if (num >= 100) then 
+        write (car,1) num 
+1       format(i3) 
+     else 
+        if (num >= 10) then 
+           write (car,2) num 
+2          format('0',i2) 
+        else 
+           write (car,3) num 
+3          format('00',i1) 
+        endif
+     endif
+  endif
+!
+  return  
+end subroutine numcar2
+
+
+ 
+! **************************************************************
+!
+subroutine grille(nx,ny,nz) 
+!-----------------------------------------------
+!   M o d u l e s 
+!-----------------------------------------------
+  USE paramx_m 
+  USE paramy_m 
+  USE paramz_m 
+!...Translated by PSUITE Trans90                  4.3ZH 16:38:40   1/27/ 4  
+!...Switches: -yv INDDO=0 -nbejkno
+  implicit none
+!-----------------------------------------------
+!   D u m m y   A r g u m e n t s
+!-----------------------------------------------
+  integer , intent(in) :: nx 
+  integer , intent(in) :: ny 
+  integer , intent(in) :: nz 
+!-----------------------------------------------
+!   L o c a l   V a r i a b l e s
+!-----------------------------------------------
+  integer :: i 
+  real , dimension(nx) :: xx 
+  real , dimension(ny) :: yy 
+  real , dimension(nz) :: zz 
+  real :: x, y, z 
+!-----------------------------------------------
+!
+! **************************************************************
+!
+   x=0. 
+   do i=1,nx 
+      xx(i)=x 
+      x=x+dx 
+   enddo
+!
+   y=0. 
+   do i=1,ny 
+      yy(i)=y 
+      y=y+dy 
+   enddo
+!
+   z=0. 
+   do i=1,nz 
+      zz(i)=z 
+      z=z+dz 
+   enddo
+!
+   open(10,file='avs.x',form='unformatted') 
+      write (10) (xx(i),i=1,nx) 
+   close(10) 
+!
+   open(10,file='avs.y',form='unformatted') 
+      write (10) (yy(i),i=1,ny) 
+   close(10) 
+!
+   open(10,file='avs.z',form='unformatted') 
+      write (10) (zz(i),i=1,nz) 
+   close(10) 
+!
+end subroutine grille
+      

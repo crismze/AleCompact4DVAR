@@ -1,0 +1,53 @@
+
+
+navier.f90 : inlet ...
+parametres.f90 : dt
+fichiers.prm : traces sauvegardes
+general.prm : Lx,Ly,Lz, Re, nb iterations, inlet
+
+g95 -d8  -c module_param.f90
+make
+./incompact3d > fichier-sauvegarde
+
+ifort -autodouble  -c module_param.f90
+
+
+
+Pour se connecter sur Penfeld:
+ssh -Xl prenom.nom penfeld
+pwd : tere2008
+
+Pour transferer des fichier de rep0xxx vers penfeld et inversement:
+
+
+Pour compiler incompact3d :
+rm -rf *.o
+gfortran  -fdefault-real-8 -c module_param.f90
+make
+./incompact3d > fichier-sauvegarde
+
+Entete du Makefile :
+FC = gfortran 
+#FC = ifort 
+#FC = g95
+OPTFC = -O3 -fdefault-integer-8 -fdefault-real-8
+#OPTFC = -O3 -i8 -r8
+#OPTFC = -O3 -i8 -r8 
+#OPTFC = -O3 -i8 -r8 -xP -static 
+#OPTFC = -O3 -autodouble -xP -static -watch all
+incompact3d :  module_param.o incompact3d.o mesure.o schemas.o derive.o \
+			 pression.o spectral.o outils.o \
+		         filtre.o parametre.o module_avs.o\
+			 controle.o front_virt.o navier.o pression6.o\
+                         jmccfft2d.o jmccfft3d.o jmccfft.o \
+			 jmccfftm.o jmccm1d2.o jmccm1d3.o \
+		         jmccm1d4.o jmccm1d5.o jmccm1d.o jmccm1dp.o jmcctranspcs.o \
+	                 jmcfftmlt.o jmcftfax.o jmcsfft2d.o jmcsfft3d.o jmcsfft.o \
+	                 jmcsfftm.o jmcsm1d.o jmcsm1dxy.o jmdecoup3.o jmdecoup.o \
+                         jmerreur1.o jmerreur2.o jmerreur3.o jmerreur4.o jmfact.o \
+                         jmfftfax.o jmgetcode.o jmgeterreur.o jmgetmessage.o \
+                         jmgetnwork.o jmgetsetcode.o jmgetseterreur.o jmgetsetnwork.o \
+                         jmgetsetstop.o jmgetstop.o jmrfftmlt.o jmscfft2d.o jmscfft3d.o \
+                         jmscfft.o jmscfftm.o jmscm1d.o jmscm1dxy.o jmsetcode.o jmseterreur.o \
+                         jmsetnwork.o jmsetstop.o jmtable.o jmtransp.o c06hbf.o \
+			 cosfftmlt.o sinfftmlt.o jmtableCos.o jmtableSin.o slfft2d.o 
